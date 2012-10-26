@@ -8,6 +8,7 @@ options {
 tokens {
   PROGRAM;
   STATEMENT;
+  LABEL;
   STMT;
   EXPR;
   ASSIGN1;
@@ -18,20 +19,20 @@ tokens {
 }
 
 prog :
-  statement prog
-  -> ^(PROGRAM statement prog)
-  
-  | // epsilon
+  statement*
+  -> ^(PROGRAM statement*)
 ;
 
 statement :
   label stmt ';'
-  -> ^(STATEMENT label stmt)
+  -> ^(STATEMENT label? stmt)
 ;
 
 label :
-  LABEL ':'
-  -> LABEL
+  lbl=LABEL ':'
+  -> ^(LABEL $lbl)
+  
+  | // epsilon
 ;
 
 stmt :
