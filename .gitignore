@@ -1,0 +1,14 @@
+# Ignore the build directory
+build
+build/*
+
+# Ignore python compiled files
+*.pyc
+
+# Ignore files with no extension
+# (Not a foolproof solution)
+#*
+#!*.*
+tests/*
+!tests/*.*
+tests/*.s
