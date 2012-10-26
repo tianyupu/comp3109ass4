@@ -1,8 +1,9 @@
 #!/bin/bash
 BUILD_DIR=build
-ANTLR_DIR=antlr-3.1.3
+ANTLR_DIR=antlr3
 
-ANTLR_JAR=${ANTLR_DIR}/lib/antlr-3.1.3.jar
+# ANTLR_JAR=${ANTLR_DIR}/lib/antlr-3.1.2.jar
+ANTLR_JAR=antlr-3.1.2.jar
 ANTLR_PY=${ANTLR_DIR}/runtime/Python
 
 rm -rf ${BUILD_DIR}

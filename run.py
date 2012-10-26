@@ -8,20 +8,22 @@ def main(filename):
   char_stream = antlr3.ANTLRFileStream(filename)
   tokens = antlr3.CommonTokenStream(JumpLexer(char_stream))
   parser = JumpParser(tokens)
-  graph = parser.prog().graph
+  #graph = parser.prog().graph
+  
+  print parser.prog()
 
-  while True:
-    graph.construct()
-    #graph.print_CFG(sys.stdout)
-    if graph.perform_JE():
-      continue
-    if graph.perform_UC():
-      continue
-    if graph.perform_DCE():
-      continue
-    break
+# while True:
+#   graph.construct()
+#   #graph.print_CFG(sys.stdout)
+#   if graph.perform_JE():
+#     continue
+#   if graph.perform_UC():
+#     continue
+#   if graph.perform_DCE():
+#     continue
+#   break
 
-  graph.print_source(sys.stdout)
+# graph.print_source(sys.stdout)
 
 if __name__ == '__main__':
   if len(sys.argv) != 2:

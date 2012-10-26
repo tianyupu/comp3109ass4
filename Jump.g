@@ -41,11 +41,11 @@ stmt :
   | IDENT '=' e1=expr OP e2=expr
   -> ^(ASSIGN2 IDENT $e1 OP $e2)
 
-  | goto=GOTO LABEL
-  -> ^(GOTO $goto LABEL)
+  | 'goto' LABEL
+  -> ^(GOTO LABEL)
 
-  | 'if' expr GOTO LABEL
-  -> ^(IF expr GOTO LABEL)
+  | 'if' expr 'goto' LABEL
+  -> ^(IF expr LABEL)
 
   | 'return' expr
   -> ^(RETURN expr)
@@ -63,4 +63,4 @@ OP : ('+'|'-'|'*'|'/'|'<'|'>'|'==') ;
 NUM : '-'?'0'..'9'+ ;
 IDENT : 'a'..'z'('a'..'z'|'0'..'9')* ;
 LABEL : 'A'..'Z'('A'..'Z'|'0'..'9')* ;
-GOTO : 'goto' ;
+WS : (' '|'\r'|'\n')+ {$channel = HIDDEN;} ;
