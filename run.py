@@ -8,13 +8,13 @@ def main(filename):
   char_stream = antlr3.ANTLRFileStream(filename)
   tokens = antlr3.CommonTokenStream(JumpLexer(char_stream))
   parser = JumpParser(tokens)
-  #graph = parser.prog().graph
-  
+  print 'hi' 
   print parser.prog()
+  graph = parser.prog().graph
 
 # while True:
 #   graph.construct()
-#   #graph.print_CFG(sys.stdout)
+#   graph.print_CFG(sys.stdout)
 #   if graph.perform_JE():
 #     continue
 #   if graph.perform_UC():
