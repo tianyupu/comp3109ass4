@@ -26,7 +26,7 @@ class CFGraph():
     """ Performs a search on the CFG and yields
     each basic block following the given block
 
-    >>> import examples
+    >>> from examples import *
     >>> set(simple_graph.basic_blocks()) == set([b1, b2, b3])
     True
     """
@@ -74,4 +74,5 @@ class CFGraph():
 
 
 if __name__ == '__main__':
-  pass
+  import doctest
+  doctest.testmod()
