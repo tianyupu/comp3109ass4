@@ -13,6 +13,9 @@ class BasicBlock():
   def gen_graphviz(self):
     pass
 
+  def __str__(self):
+    return self.code
+
 
 class CFGraph():
   def __init__(self):
@@ -32,3 +35,6 @@ class CFGraph():
 
   def remove_jumps(self):
     pass
+  
+  def __str__(self):
+    return self.root.code
