@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 class BasicBlock():
   def __init__(self, code):
     self.code = code
@@ -5,8 +7,8 @@ class BasicBlock():
     self.gen = set()
     self.kill = set()
 
-    self.in_edges = {}
-    self.out_edges = {}
+    self.in_edges = set()
+    self.out_edges = set()
 
   def gen_graphviz(self):
     pass
