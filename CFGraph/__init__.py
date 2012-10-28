@@ -66,8 +66,19 @@ class CFGraph():
     pass
 
   def remove_jumps(self):
+    """ Removes unnecessary jumps from the CFG
+    """
+
     pass
   
+  def linearize(self):
+    """ Linearizes the CFG and
+    returns a string of code
+    """
+
+    pass
+    
+
   def __str__(self):
     return self.root.code
 
