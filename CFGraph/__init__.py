@@ -23,6 +23,36 @@ class BasicBlock():
     self.in_edges = set()
     self.out_edges = set()
 
+  def add_edges(self, blocks):
+    """ Adds given blocks to this blocks out edge set
+    and adds this block to the given blocks' in edge set
+
+    >>> b1 = BasicBlock('')
+    >>> b2 = BasicBlock('')
+    >>> b3 = BasicBlock('')
+    >>> b1.add_edges([b2])
+    >>> b2.add_edges([b1, b3])
+    >>> 
+    >>> b1.out_edges == set([b2])
+    True
+    >>> b1.in_edges == set([b2])
+    True
+    >>> b2.out_edges == set([b1, b3])
+    True
+    >>> b2.in_edges == set([b1])
+    True
+    >>> b3.out_edges == set()
+    True
+    >>> b3.in_edges == set([b2])
+    True
+    """
+    # Add given blocks as out edges to this basic block
+    self.out_edges.update(blocks)
+    
+    # Add this block as an in edge to given blocks
+    for block in blocks:
+      block.in_edges.add(self)
+
   def gen_graphviz(self):
     pass
 
@@ -31,6 +61,7 @@ class BasicBlock():
 
   def __repr__(self):
     return "<BasicBlock: %s>" % str(self.label)
+
 
 class Cond():
   def __init__(self, var, true_block, false_block):

@@ -25,12 +25,6 @@ b1 = BasicBlock("""
 simple_graph = CFGraph()
 simple_graph.root = b1
 
-b1.out_edges.add(b2)
-b2.in_edges.add(b1)
-
-b2.out_edges.update([b3, b4])
-b3.in_edges.add(b2)
-b4.in_edges.add(b2)
-
-b3.out_edges.add(b2)
-b2.in_edges.add(b3)
+b1.add_edges([b2])
+b2.add_edges([b3, b4])
+b3.add_edges([b2])
