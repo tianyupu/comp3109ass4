@@ -1,13 +1,25 @@
 #!/usr/bin/env python
 
 class BasicBlock():
-  def __init__(self, code):
+  def __init__(self, code, label=None, cond=None):
     # Remove unnecessary whitespace from code
-    self.code = '\n'.join([line.strip() for line in code])
+    self.code = '\n'.join([line.strip() for line in code.strip().splitlines()])
 
+    # Label for the basic block
+    if label == None:
+      self.label = 'new_label' # TODO generate names
+    else:
+      self.label = label
+    
+    # Condition at the end of the basic block
+    # None if no conditional jump
+    self.cond = cond
+
+    # Gen and kill sets
     self.gen = set()
     self.kill = set()
 
+    # In and out edges in the CFG
     self.in_edges = set()
     self.out_edges = set()
 
@@ -16,6 +28,9 @@ class BasicBlock():
 
   def __str__(self):
     return self.code
+
+  def __repr__(self):
+    return "<BasicBlock: %s>" % str(self.label)
 
 class Cond():
   def __init__(self, var, true_block, false_block):

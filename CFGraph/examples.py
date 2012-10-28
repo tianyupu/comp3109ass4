@@ -6,22 +6,31 @@ from __init__ import *
 # The example Control Flow Graph
 # from the assignment spec.
 
-b1 = BasicBlock("""
-    i = 1;
-    s = 0;
-    b = 1 > 100;
-    if b goto L2;""")
-
-b2 = BasicBlock("""
-    L2: return s;""")
+b4 = BasicBlock("""
+    return s;""", 'L2')
 
 b3 = BasicBlock("""
     s = s + 1;
     i = i + 1;""")
 
+b2 = BasicBlock("""
+    b = i > 100;""", 'L1',
+    Cond('b', b4, b3))
+
+b1 = BasicBlock("""
+    i = 1;
+    s = 0;""")
+
+
 simple_graph = CFGraph()
-
 simple_graph.root = b1
-simple_graph.root.out_edges.update([b2, b3])
-simple_graph.root.in_edges.add(b2)
 
+b1.out_edges.add(b2)
+b2.in_edges.add(b1)
+
+b2.out_edges.update([b3, b4])
+b3.in_edges.add(b2)
+b4.in_edges.add(b2)
+
+b3.out_edges.add(b2)
+b2.in_edges.add(b3)
