@@ -98,13 +98,54 @@ class CFGraph():
 
     pass
   
-  def linearize(self):
+  def linearize(self, indent=''):
     """ Linearizes the CFG and
     returns a string of code
+
+    >>> from examples import *
+    >>> code = simple_graph.linearize()
+    >>> code == '\\n'.join(map(str,
+    ... [b1, b2.label+':', b2, b2.cond, b3,
+    ... 'goto %s;'%b2.label, b4.label+':', b4]))
+    True
     """
 
-    pass
-    
+    # Linearized code string
+    code = ""
+
+    # Join together the blocks of code
+    prev_block = None
+    for block in self.basic_blocks():
+      # Add jump from the previous block if necessary
+      if prev_block:
+        jumps = prev_block.out_edges - set([block])
+        
+        # Conditional jump cases
+        if prev_block.cond:
+          cond = prev_block.cond
+          if len(jumps) == 1 and prev_block.cond:
+            code += indent+str(cond)+'\n'
+          elif len(jumps) == 2:
+            code += indent+str(cond)+'\n'
+            code += indent+'goto %s\n' % cond.false.label
+        
+        # Non-conditional jump cases
+        else:
+          if len(jumps) == 1:
+            code += indent+'goto %s;\n' % jumps.pop().label
+
+      # Add labels if necessary
+      if block.in_edges - set([prev_block]) != set():
+        code += '%s:\n' % block.label
+      
+      # Add block code with indentation
+      code += '\n'.join([indent+c for c in block.code.splitlines()])+'\n'
+
+      # Next block of code
+      prev_block = block
+
+    return code.rstrip()
+
 
   def __str__(self):
     return self.root.code
