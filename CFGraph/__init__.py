@@ -17,6 +17,15 @@ class BasicBlock():
   def __str__(self):
     return self.code
 
+class Cond():
+  def __init__(self, var, true_block, false_block):
+    self.var = var
+    self.true_block = true_block
+    self.false_block = false_block
+
+  def __str__(self):
+    return 'if %s goto %s;' % (self.var, self.true_block.label)
+    
 
 class CFGraph():
   def __init__(self):
