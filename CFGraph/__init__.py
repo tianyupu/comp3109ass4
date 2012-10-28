@@ -46,36 +46,39 @@ class CFGraph():
   def __init__(self):
     self.root = None
 
-  def basic_blocks(self, block=None):
+  def basic_blocks(self, start=None):
     """ Performs a search on the CFG and yields
     each basic block following the given block
 
     >>> from examples import *
-    >>> set(simple_graph.basic_blocks()) == set([b1, b2, b3])
+    >>> set(simple_graph.basic_blocks()) == set([b1, b2, b3, b4])
     True
     """
 
     # Start at the root by default
-    if not block:
-      block = self.root
+    if not start:
+      start = self.root
     
     # Keep track of visited nodes
     visited = set()
 
-    # Yield this block
-    yield block
-    visited.add(block)
-
     # Next set of nodes to look at
-    horizon = set(block.out_edges)
+    horizon = [start]
 
     # Recursively yield the next set of blocks
     while horizon:
-      next_block = horizon.pop()
-      if next_block not in visited:
-        yield next_block
-        visited.add(next_block)
-        horizon.update(next_block.out_edges)
+      block = horizon.pop()
+      if block not in visited:
+        yield block
+        visited.add(block)
+
+        # Add in the next set of blocks
+        if block.cond:
+          # Prefer false conditional jump next
+          horizon.append(block.cond.true_block)
+          horizon.append(block.cond.false_block)
+        else:
+          horizon.extend(block.out_edges)
 
   def gen_graphviz(self):
     pass
