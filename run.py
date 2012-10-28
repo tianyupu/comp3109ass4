@@ -8,9 +8,10 @@ def main(filename):
   char_stream = antlr3.ANTLRFileStream(filename)
   tokens = antlr3.CommonTokenStream(JumpLexer(char_stream))
   parser = JumpParser(tokens)
-  print 'hi' 
   print parser.prog()
-  graph = parser.prog().graph
+  print parser
+
+# graph = parser.prog().graph
 
 # while True:
 #   graph.construct()
