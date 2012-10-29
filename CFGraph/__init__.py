@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
 class BasicBlock():
+  label_num = 0
   def __init__(self, code, label=None, cond=None):
     # Remove unnecessary whitespace from code
     self.code = '\n'.join([line.strip() for line in code.strip().splitlines()])
 
     # Label for the basic block
     if label == None:
-      self.label = 'new_label' # TODO generate names
+      self.label = BasicBlock.gen_label() # TODO generate names
     else:
       self.label = label
     
@@ -22,6 +23,12 @@ class BasicBlock():
     # In and out edges in the CFG
     self.in_edges = set()
     self.out_edges = set()
+  
+  @staticmethod
+  def gen_label():
+    label = "LX%s" % BasicBlock.label_num
+    BasicBlock.label_num += 1
+    return label
 
   def add_edges(self, blocks):
     """ Adds given blocks to this blocks out edge set
