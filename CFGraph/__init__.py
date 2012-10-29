@@ -92,6 +92,7 @@ class Cond():
 class CFGraph():
   def __init__(self):
     self.root = None
+    self.blocks = set()
 
   def basic_blocks(self, start=None):
     """ Performs a search on the CFG and yields
