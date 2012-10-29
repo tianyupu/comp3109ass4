@@ -61,7 +61,13 @@ class BasicBlock():
       block.in_edges.add(self)
 
   def gen_graphviz(self):
-    pass
+    c = self.code
+    if self.cond:
+      c += '\n' + str(self.cond)
+    links = ['  %s [label="%s:\\n%s"];' % (self.label, self.label, c.replace('\n', '\\n'))]
+    for block in self.out_edges:
+      links.append('  %s -> %s;' % (self.label, block.label))
+    return '\n'.join(links)
 
   def __str__(self):
     return self.code
@@ -119,7 +125,31 @@ class CFGraph():
           horizon.extend(block.out_edges)
 
   def gen_graphviz(self):
-    pass
+    """ Returns a textual representation of
+    the control flow graph that can be visualised
+    using Graphviz
+    
+    >>> from examples import *
+    >>> print simple_graph.gen_graphviz()
+    digraph prog {
+      node [shape=rectangle];
+      LX0 [label="LX0:\\ni = 1;\\ns = 0;"];
+      LX0 -> L1;
+      L1 [label="L1:\\nb = i > 100;\\nif b goto L2;"];
+      L1 -> L2;
+      L1 -> LX1;
+      LX1 [label="LX1:\\ns = s + 1;\\ni = i + 1;"];
+      LX1 -> L1;
+      L2 [label="L2:\\nreturn s;"];
+    }
+    """
+    s = """digraph prog {
+  node [shape=rectangle];"""
+    for block in self.basic_blocks(self.root):
+      s += '\n'
+      s += block.gen_graphviz()
+    s += '\n}';
+    return s
 
   def optimize(self):
     pass
@@ -184,11 +214,8 @@ class CFGraph():
 
     return code.rstrip()
 
-
   def __str__(self):
     return self.root.code
-
-
 
 if __name__ == '__main__':
   import doctest

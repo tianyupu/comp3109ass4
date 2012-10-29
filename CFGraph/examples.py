@@ -11,7 +11,7 @@ b4 = BasicBlock("""
 
 b3 = BasicBlock("""
     s = s + 1;
-    i = i + 1;""")
+    i = i + 1;""", 'LX1')
 
 b2 = BasicBlock("""
     b = i > 100;""", 'L1',
@@ -19,7 +19,7 @@ b2 = BasicBlock("""
 
 b1 = BasicBlock("""
     i = 1;
-    s = 0;""")
+    s = 0;""", 'LX0')
 
 
 simple_graph = CFGraph()
