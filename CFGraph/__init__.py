@@ -132,6 +132,11 @@ class CFGraph():
   def linearized_blocks(self):
     """ Returns blocks much like the basic_blocks method.
     However the blocks are returned in an optimal order.
+
+    >>> from examples import *
+    >>> blocks = simple_graph.linearized_blocks()
+    >>> list(blocks) == [b1, b2, b3, b4]
+    True
     """
 
     # Set of all blocks
