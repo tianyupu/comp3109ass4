@@ -137,6 +137,9 @@ class CFGraph():
     >>> blocks = simple_graph.linearized_blocks()
     >>> list(blocks) == [b1, b2, b3, b4]
     True
+    >>> blocks = jump_graph.linearized_blocks()
+    >>> list(blocks) == [b11, b13, b12, b14]
+    True
     """
 
     # Set of all blocks
