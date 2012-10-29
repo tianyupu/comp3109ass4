@@ -29,5 +29,3 @@ b1.add_edges([b2])
 b2.add_edges([b3, b4])
 b3.add_edges([b2])
 
-print simple_graph
-print simple_graph.basic_blocks
