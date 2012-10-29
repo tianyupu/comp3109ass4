@@ -12,3 +12,7 @@ build/*
 tests/*
 !tests/*.*
 tests/*.s
+
+# Ignore generated dot and png files
+*.png
+*.dot

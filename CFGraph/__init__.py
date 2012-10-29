@@ -64,7 +64,10 @@ class BasicBlock():
     c = self.code
     if self.cond:
       c += '\n' + str(self.cond)
-    links = ['  %s [label="%s:\\n%s"];' % (self.label, self.label, c.replace('\n', '\\n'))]
+    links = []
+    node_def = '  {label} [label="{label}:\\l{code}"];'
+    links.append(
+        node_def.format(label=self.label, code=c.replace('\n', '\\l')))
     for block in self.out_edges:
       links.append('  %s -> %s;' % (self.label, block.label))
     return '\n'.join(links)
@@ -144,8 +147,8 @@ class CFGraph():
     }
     """
     s = """digraph prog {
-  node [shape=rectangle];"""
-    for block in self.basic_blocks(self.root):
+  node [shape=rectangle,fontname=Courier];"""
+    for block in self.blocks:
       s += '\n'
       s += block.gen_graphviz()
     s += '\n}';
