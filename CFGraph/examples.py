@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from copy import deepcopy
 
 # CFG objects
 from __init__ import *
@@ -32,6 +33,7 @@ b3.add_edges([b2])
 
 # A Control Flow Graph
 # for testing linearization
+
 b14 = BasicBlock("""
     return x;""", 'L4')
 
@@ -52,3 +54,10 @@ b13.add_edges([b12])
 b12.add_edges([b14])
 
 
+# A Control Flow Graph
+# for testing dead code
+
+b15 = BasicBlock("""
+    x = 100""", 'L5')
+
+dead_graph = deepcopy(jump_graph)

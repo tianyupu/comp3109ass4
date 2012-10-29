@@ -140,6 +140,9 @@ class CFGraph():
     >>> blocks = jump_graph.linearized_blocks()
     >>> list(blocks) == [b11, b13, b12, b14]
     True
+    >>> blocks = dead_graph.linearized_blocks()
+    >>> b15 not in blocks
+    True
     """
 
     # Set of all blocks
