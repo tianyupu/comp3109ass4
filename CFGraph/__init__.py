@@ -238,11 +238,17 @@ class CFGraph():
     returns a string of code
 
     >>> from examples import *
-    >>> code = simple_graph.code_string()
-    >>> code == '\\n'.join(map(str,
-    ... [b1, b2.label+':', b2, b2.cond, b3,
-    ... 'goto %s;'%b2.label, b4.label+':', b4]))
-    True
+    >>> print simple_graph.code_string()
+    i = 1;
+    s = 0;
+    L1:
+    b = i > 100;
+    if b goto L2;
+    s = s + 1;
+    i = i + 1;
+    goto L1;
+    L2:
+    return s;
     """
 
     # Linearized code string
