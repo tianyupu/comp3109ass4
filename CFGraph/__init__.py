@@ -134,14 +134,59 @@ class CFGraph():
     However the blocks are returned in an optimal order.
     """
 
-    pass
+    # Set of all blocks
+    all_blocks = set(self.basic_blocks())
 
-  def code_string(self, indent=''):
+    # Set of blocks to explore
+    cond = []
+    non_cond = []
+    if self.root.cond:
+      cond.append(self.root)
+    else:
+      non_cond.append(self.root)
+    # Set of visited blocks
+    visited = set()
+
+    while visited != all_blocks:
+      # Yield all available conditionals first
+      while cond:
+        block = cond.pop()
+        if block not in visited:
+          yield block
+          visited.add(block)
+
+          # Add in the next set of blocks
+          if block.cond:
+            # Prefer false conditional jump next
+            cond.append(block.cond.true_block)
+            cond.append(block.cond.false_block)
+          else:
+            # Add next block to the non-conditional horizon
+            non_cond.extend(block.out_edges)
+
+      # Then a non-conditional jump
+      while non_cond and not cond:
+        block = non_cond.pop()
+        if block not in visited:
+          yield block
+          visited.add(block)
+
+        # Add in next blocks
+        if not block.cond:
+          # Add next block to the non-conditional horizon
+          non_cond.extend(block.out_edges)
+        else:
+          # If we find a conditional exit
+          # so we can optimise for conditional jumps first
+          cond.append(block.cond.true_block)
+          cond.append(block.cond.false_block)
+    
+  def code_string(self, indent='', optimized=True):
     """ Linearizes the CFG and
     returns a string of code
 
     >>> from examples import *
-    >>> code = simple_graph.linearize()
+    >>> code = simple_graph.code_string()
     >>> code == '\\n'.join(map(str,
     ... [b1, b2.label+':', b2, b2.cond, b3,
     ... 'goto %s;'%b2.label, b4.label+':', b4]))
@@ -151,9 +196,15 @@ class CFGraph():
     # Linearized code string
     code = ""
 
+    # The linearized set of basic blocks
+    if optimized:
+      linearized_blocks = self.linearized_blocks()
+    else:
+      linearized_blocks = self.basic_blocks()
+
     # Join together the blocks of code
     prev_block = None
-    for block in self.linearized_blocks():
+    for block in linearized_blocks:
       # Add jump from the previous block if necessary
       if prev_block:
         jumps = prev_block.out_edges - set([block])
