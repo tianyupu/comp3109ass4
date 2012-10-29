@@ -129,7 +129,14 @@ class CFGraph():
 
     pass
   
-  def linearize(self, indent=''):
+  def linearized_blocks(self):
+    """ Returns blocks much like the basic_blocks method.
+    However the blocks are returned in an optimal order.
+    """
+
+    pass
+
+  def code_string(self, indent=''):
     """ Linearizes the CFG and
     returns a string of code
 
@@ -146,7 +153,7 @@ class CFGraph():
 
     # Join together the blocks of code
     prev_block = None
-    for block in self.basic_blocks():
+    for block in self.linearized_blocks():
       # Add jump from the previous block if necessary
       if prev_block:
         jumps = prev_block.out_edges - set([block])
