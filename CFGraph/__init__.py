@@ -68,7 +68,7 @@ class BasicBlock():
     node_def = '  {label} [label="{label}:\\l{code}"];'
     links.append(
         node_def.format(label=self.label, code=c.replace('\n', '\\l')))
-    for block in self.out_edges:
+    for block in sorted(self.out_edges,key=lambda x:x.label):
       links.append('  %s -> %s;' % (self.label, block.label))
     return '\n'.join(links)
 
@@ -136,20 +136,20 @@ class CFGraph():
     >>> from examples import *
     >>> print simple_graph.gen_graphviz()
     digraph prog {
-      node [shape=rectangle];
-      LX0 [label="LX0:\\ni = 1;\\ns = 0;"];
-      LX0 -> L1;
-      L1 [label="L1:\\nb = i > 100;\\nif b goto L2;"];
+      node [shape=rectangle,fontname=Courier];
+      L1 [label="L1:\\lb = i > 100;\\lif b goto L2;"];
       L1 -> L2;
       L1 -> LX1;
-      LX1 [label="LX1:\\ns = s + 1;\\ni = i + 1;"];
+      L2 [label="L2:\\lreturn s;"];
+      LX0 [label="LX0:\\li = 1;\\ls = 0;"];
+      LX0 -> L1;
+      LX1 [label="LX1:\\ls = s + 1;\\li = i + 1;"];
       LX1 -> L1;
-      L2 [label="L2:\\nreturn s;"];
     }
     """
     s = """digraph prog {
   node [shape=rectangle,fontname=Courier];"""
-    for block in self.blocks:
+    for block in sorted(self.blocks,key=lambda x:x.label):
       s += '\n'
       s += block.gen_graphviz()
     s += '\n}';
