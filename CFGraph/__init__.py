@@ -62,14 +62,22 @@ class BasicBlock():
 
   def gen_graphviz(self):
     c = self.code
+
+    # add the condition's code to the graphviz output
     if self.cond:
       c += '\n' + str(self.cond)
-    links = []
-    node_def = '  {label} [label="{label}:\\l{code}"];'
+    c = c.replace('\n', '\\l')
+
+    links = [] # stores each line in a list
+    node_def = '  {label} [label="{label}:\\l{code}"];' # template for node labelling
     links.append(
-        node_def.format(label=self.label, code=c.replace('\n', '\\l')))
+        node_def.format(label=self.label, code=c))
+
+    # append each outlink to the list of links
     for block in sorted(self.out_edges,key=lambda x:x.label):
       links.append('  %s -> %s;' % (self.label, block.label))
+
+    # join them together and return the graphviz code for this block
     return '\n'.join(links)
 
   def __str__(self):
@@ -150,8 +158,8 @@ class CFGraph():
     s = """digraph prog {
   node [shape=rectangle,fontname=Courier];"""
     for block in sorted(self.blocks,key=lambda x:x.label):
-      s += '\n'
-      s += block.gen_graphviz()
+      s += '\n' # separate each block with newline
+      s += block.gen_graphviz() # add the graphviz code for each block
     s += '\n}';
     return s
 
