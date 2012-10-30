@@ -102,12 +102,12 @@ class CFGraph():
     self.root = None
     self.blocks = set()
 
-  def basic_blocks(self, start=None):
+  def reachable_blocks(self, start=None):
     """ Performs a search on the CFG and yields
     each basic block following the given block
 
     >>> from examples import *
-    >>> set(simple_graph.basic_blocks()) == set([b1, b2, b3, b4])
+    >>> set(simple_graph.reachable_blocks()) == set([b1, b2, b3, b4])
     True
     """
 
@@ -119,7 +119,7 @@ class CFGraph():
     visited = set()
 
     # Next set of nodes to look at
-    horizon = [start]
+    horizon = set([start])
 
     # Recursively yield the next set of blocks
     while horizon:
@@ -129,12 +129,7 @@ class CFGraph():
         visited.add(block)
 
         # Add in the next set of blocks
-        if block.cond:
-          # Prefer false conditional jump next
-          horizon.append(block.cond.true_block)
-          horizon.append(block.cond.false_block)
-        else:
-          horizon.extend(block.out_edges)
+        horizon.update(block.out_edges)
 
   def gen_graphviz(self):
     """ Returns a textual representation of
@@ -170,7 +165,7 @@ class CFGraph():
     pass
 
   def remove_unreachable(self):
-    pass
+    self.blocks = self.reachable_blocks()
 
   def remove_jumps(self):
     """ Removes unnecessary jumps from the CFG
@@ -179,7 +174,7 @@ class CFGraph():
     pass
   
   def linearized_blocks(self):
-    """ Returns blocks much like the basic_blocks method.
+    """ Returns blocks much like the reachable_blocks method.
     However the blocks are returned in an optimal order.
 
     >>> from examples import *
@@ -195,7 +190,7 @@ class CFGraph():
     """
 
     # Set of all blocks
-    all_blocks = set(self.basic_blocks())
+    all_blocks = set(self.reachable_blocks())
 
     # Set of blocks to explore
     cond = []
@@ -262,11 +257,11 @@ class CFGraph():
     # Linearized code string
     code = ""
 
-    # The linearized set of basic blocks
+    # The linearized set of reachable blocks
     if optimized:
       linearized_blocks = self.linearized_blocks()
     else:
-      linearized_blocks = self.basic_blocks()
+      linearized_blocks = self.reachable_blocks()
 
     # Join together the blocks of code
     prev_block = None
