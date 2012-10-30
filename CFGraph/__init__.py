@@ -3,6 +3,7 @@
 class BasicBlock():
   label_num = 0
   def __init__(self, code, label=None, cond=None):
+    """Create a BasicBlock from a string of statements."""
     # Remove unnecessary whitespace from code
     self.code = '\n'.join([line.strip() for line in code.strip().splitlines()])
 
