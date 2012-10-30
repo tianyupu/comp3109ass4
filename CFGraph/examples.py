@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from copy import deepcopy
+from copy import copy
 
 # CFG objects
 from __init__ import *
@@ -65,7 +65,7 @@ graphs['jump'] = jump_graph
 b15 = BasicBlock("""
     x = 100""", 'L5')
 
-dead_graph = deepcopy(jump_graph)
+dead_graph = copy(jump_graph)
 
 dead_graph.blocks.add(b15)
 graphs['dead'] = dead_graph

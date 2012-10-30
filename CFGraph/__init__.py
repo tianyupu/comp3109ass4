@@ -95,7 +95,7 @@ class Cond():
 
   def __str__(self):
     return 'if %s goto %s;' % (self.var, self.true_block.label)
-    
+
 
 class CFGraph():
   def __init__(self):
@@ -108,6 +108,10 @@ class CFGraph():
 
     >>> from examples import *
     >>> set(simple_graph.reachable_blocks()) == set([b1, b2, b3, b4])
+    True
+    >>> dead_graph.blocks == set([b11, b12, b13, b14, b15])
+    True
+    >>> set(dead_graph.reachable_blocks()) == set([b11, b12, b13, b14])
     True
     """
 
