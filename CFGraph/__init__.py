@@ -169,7 +169,7 @@ class CFGraph():
     pass
 
   def remove_unreachable(self):
-    self.blocks = self.reachable_blocks()
+    self.blocks = set(self.reachable_blocks())
 
   def remove_jumps(self):
     """ Removes unnecessary jumps from the CFG
