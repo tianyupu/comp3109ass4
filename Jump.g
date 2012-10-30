@@ -30,17 +30,17 @@ statement :
 
 label :
   lbl=LABEL ':'
-  -> ^(LABEL $lbl)
+  -> ^(LABEL $lbl ':')
   
   | // epsilon
 ;
 
 stmt :
   IDENT '=' expr
-  -> ^(ASSIGN1 IDENT expr)
+  -> ^(ASSIGN1 IDENT '=' expr)
 
   | IDENT '=' e1=expr OP e2=expr
-  -> ^(ASSIGN2 IDENT $e1 OP $e2)
+  -> ^(ASSIGN2 IDENT '=' $e1 OP $e2)
 
   | 'goto' LABEL
   -> ^(GOTO LABEL)
@@ -49,15 +49,15 @@ stmt :
   -> ^(IF expr LABEL)
 
   | 'return' expr
-  -> ^(RETURN expr)
+  -> ^(RETURN 'return' expr)
 ;
 
 expr :
   IDENT
-  -> ^(EXPR IDENT)
+  -> IDENT
 
   | NUM
-  -> ^(EXPR NUM)
+  -> NUM
 ;
 
 OP : ('+'|'-'|'*'|'/'|'<'|'>'|'==') ;

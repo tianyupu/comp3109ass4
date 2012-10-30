@@ -24,6 +24,11 @@ class BasicBlock():
     # In and out edges in the CFG
     self.in_edges = set()
     self.out_edges = set()
+
+  def add_stmt(self, stmt):
+    """Add a single statement to the end of this BasicBlock,
+    given as a string."""
+    self.code += '\n' + stmt.strip()
   
   @staticmethod
   def gen_label():
