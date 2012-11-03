@@ -1,0 +1,23 @@
+  i = 1;
+  s = 0;
+L1:
+  i = 10;
+  goto L9;
+L2:
+  return s;
+L3:
+  i = 2;
+  goto L8;
+L4:
+  return s;
+L5:
+  return s;
+L6:
+  return s;
+L7:
+  goto L9;
+L8:
+  goto L9;
+L9:
+  return i;
+

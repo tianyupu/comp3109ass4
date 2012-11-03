@@ -1,0 +1,15 @@
+  i = 1;
+  s = 0;
+L1:
+  b = i;
+  s = s + i;
+  i = i + 1;
+  goto L3;
+L2:
+  return s;
+L3:
+  c = i;
+  d = c;
+  e = i;
+  f = e;
+  goto L2;
