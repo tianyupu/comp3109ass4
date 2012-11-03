@@ -56,27 +56,26 @@ def make_graph(node):
   lbl2index = {}
   links = defaultdict(set) # tracking the edges as we come across them
   while leaders:
-    print "LEADERS:", leaders
-    print "BLOCKS SO FAR:", blocks
-    print "LBLS SO FAR:", lbl2index
     curr_lineno = leaders.popleft()
     next_lineno = nxt_leads.popleft()
     finished = False
     code = []
     lbl = None
     cond = None
-    links[curr_lineno].add(next_lineno) # update the outgoing link
+    goto = False
     if next_lineno < curr_lineno:
-      next_lineno = len(node.children)-1
-    if next_lineno == curr_lineno:
-      nodes = [node.children[curr_lineno]]
-    else:
-      nodes = node.children[curr_lineno:next_lineno]
+      next_lineno = len(node.children)
+    #if next_lineno == curr_lineno:
+    #  nodes = [node.children[curr_lineno]]
+    #else:
+    #  nodes = node.children[curr_lineno:next_lineno]
+    nodes = node.children[curr_lineno:next_lineno]
     for stmt_node in nodes:
       if len(stmt_node.children) == 2:
         # if this statement has a label, note that down
         lbl, stmt_body = stmt_node.children
-        lbl2index[lbl.text] = curr_lineno
+        #lbl2index[lbl.text] = curr_lineno
+        lbl = lbl.text
       else:
         stmt_body, = stmt_node.children
       # otherwise, examine the actual body of this statement
@@ -85,30 +84,42 @@ def make_graph(node):
         # the block that we want to link to has not been created yet
         if target_lbl.text in lbl2index:
           true_index = lbl2index[target_lbl.text]
+          if true_index in blocks and next_lineno in blocks:
+            cond = CFGraph.Cond(expr.text, blocks[true_index], blocks[next_lineno])
+            finished = True
+            links[curr_lineno].add(true_index)
         else:
           break
-        if true_index not in blocks or next_lineno not in blocks:
-          break
-        cond = CFGraph.Cond(expr.text, blocks[true_index], blocks[next_lineno])
-        finished = True
       if stmt_body.token.text == 'GOTO':
         target_lbl, = stmt_body.children
-        targ_index = lbl2index[target_lbl.text]
-        links[curr_lineno].add(targ_index)
-        finished = True
-      code.append(' '.join([n.text for n in stmt_body.children]))
+        if target_lbl.text in lbl2index:
+          targ_index = lbl2index[target_lbl.text]
+          links[curr_lineno].add(targ_index)
+          finished = True
+          goto = True
+        else:
+          break
+      if not goto:
+        code.append(' '.join([n.text for n in stmt_body.children]))
+        links[curr_lineno].add(next_lineno) # update the outgoing link
     # we've gone through all statements without hitting if or goto
+    # or this block just doesn't have either of those
     if len(code) == next_lineno-curr_lineno:
       finished = True
-    elif len(code) == 1 and next_lineno == curr_lineno:
-      finished = True
+    #elif len(code) == 1 and next_lineno == curr_lineno:
+    #  finished = True
     if finished:
       code_str = ';\n'.join(code) + ';\n'
-      blocks[curr_lineno] = CFGraph.BasicBlock(code_str, lbl, cond)
+      new_block = CFGraph.BasicBlock(code_str, lbl, cond)
+      blocks[curr_lineno] = new_block
+      lbl2index[new_block.label] = curr_lineno
       continue
     leaders.append(curr_lineno)
     nxt_leads.append(next_lineno)
 
+  print blocks
+  print lbl2index
+  print links
   for index in blocks:
     l = links[index] # get all the indexes of outgoing link blocks
     blocks[index].add_edges([blocks[li] for li in l]) # add all the links
