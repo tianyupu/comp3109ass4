@@ -26,22 +26,27 @@ def main(filename):
   f.close()
   call("dot -T png run.dot -o run.png", shell=True)
 
+def gen_leaders(leaders):
+  nexts = deque()
+  for l in leaders:
+    nexts.append(l)
+  nexts.append(nexts.popleft())
+  for i in xrange(len(leaders)):
+    yield (leaders[i], nexts[i])
+
 def make_graph(node):
   # a list of the index numbers of the leaders as 
   # discovered from the set of nodes from the root
   leaders = deque() 
-  nxt_leads = deque()
 
   for lineno, child in enumerate(node.children):
     # first line in 'function'
     if lineno == 0 and child.token.text == 'STATEMENT':
       leaders.append(lineno)
-      nxt_leads.append(lineno)
     # statement begins with label
     elif len(child.children) == 2:
       lbl, stmt = child.children
       leaders.append(lineno)
-      nxt_leads.append(lineno)
     # if previous was goto, if or return, 
     # then this will be start of new block
     elif lineno > 1:
@@ -49,84 +54,102 @@ def make_graph(node):
       stmt_body = prev_stmt.children[-1]
       if stmt_body.token.text in ['GOTO', 'IF', 'RETURN']:
         leaders.append(lineno)
-        nxt_leads.append(lineno)
 
-  nxt_leads.rotate(-1)
+  stmt_no = deque(range(len(node.children))) # line numbers of all statements
   blocks = {} # blocks referenced by their index numbers
   lbl2index = {}
   links = defaultdict(set) # tracking the edges as we come across them
-  while leaders:
-    curr_lineno = leaders.popleft()
-    next_lineno = nxt_leads.popleft()
-    finished = False
-    code = []
+  while stmt_no: # while there are still unallocated statements
     lbl = None
     cond = None
-    goto = False
-    if next_lineno < curr_lineno:
-      next_lineno = len(node.children)
-    #if next_lineno == curr_lineno:
-    #  nodes = [node.children[curr_lineno]]
-    #else:
-    #  nodes = node.children[curr_lineno:next_lineno]
-    nodes = node.children[curr_lineno:next_lineno]
-    for stmt_node in nodes:
-      if len(stmt_node.children) == 2:
-        # if this statement has a label, note that down
-        lbl, stmt_body = stmt_node.children
-        #lbl2index[lbl.text] = curr_lineno
-        lbl = lbl.text
-      else:
-        stmt_body, = stmt_node.children
-      # otherwise, examine the actual body of this statement
-      if stmt_body.token.text == 'IF':
-        expr, target_lbl = stmt_body.children
-        # the block that we want to link to has not been created yet
-        if target_lbl.text in lbl2index:
-          true_index = lbl2index[target_lbl.text]
-          if true_index in blocks and next_lineno in blocks:
-            cond = CFGraph.Cond(expr.text, blocks[true_index], blocks[next_lineno])
-            finished = True
-            links[curr_lineno].add(true_index)
-        else:
-          break
-      if stmt_body.token.text == 'GOTO':
-        target_lbl, = stmt_body.children
-        if target_lbl.text in lbl2index:
-          targ_index = lbl2index[target_lbl.text]
-          links[curr_lineno].add(targ_index)
-          finished = True
-          goto = True
-        else:
-          break
-      if not goto:
-        code.append(' '.join([n.text for n in stmt_body.children]))
-        links[curr_lineno].add(next_lineno) # update the outgoing link
-    # we've gone through all statements without hitting if or goto
-    # or this block just doesn't have either of those
-    if len(code) == next_lineno-curr_lineno:
-      finished = True
-    #elif len(code) == 1 and next_lineno == curr_lineno:
-    #  finished = True
-    if finished:
-      code_str = ';\n'.join(code) + ';\n'
-      new_block = CFGraph.BasicBlock(code_str, lbl, cond)
-      blocks[curr_lineno] = new_block
-      lbl2index[new_block.label] = curr_lineno
-      continue
-    leaders.append(curr_lineno)
-    nxt_leads.append(next_lineno)
+    curr_lineno = stmt_no.popleft() # get the leftmost statement
+    stmt_node = node.children[curr_lineno] # retrieve the statement node from the parser
 
-  print blocks
-  print lbl2index
-  print links
+    # if there's a label, retrieve that separately
+    # stmt_body contains the subtree with the statement
+    if len(stmt_node.children) == 2:
+      lbl, stmt_body = stmt_node.children
+      lbl = lbl.text
+    else:
+      stmt_body, = stmt_node.children
+    # the actual line of code at this line number
+    code_line = ' '.join([n.text for n in stmt_body.children]) + ';'
+
+    # now we need to find the basic block that this statement belongs to
+    # by examining each block number in turn and comparing it with the
+    # statement number
+    prev_leader, prev_nxt = 0, 0
+    for leader, nxt_leader in gen_leaders(leaders):
+      # if the current block no is larger, then the statement must belong
+      # to the previous block that we saw
+      if leader > curr_lineno:
+        curr_blockno = prev_leader
+        nxt_leader = prev_nxt
+        break
+      elif leader == curr_lineno:
+        curr_blockno = leader
+      prev_leader, prev_nxt = leader, nxt_leader
+
+    # if this block hasn't been created yet, create it and we'll add
+    # statements to it later
+    if curr_blockno not in blocks:
+      new_block = CFGraph.BasicBlock(code_line, lbl, cond)
+      blocks[curr_blockno] = new_block
+      lbl2index[new_block.label] = curr_blockno
+      continue # move onto the next statement; notice that we've consumed a statement from stmt_no
+
+    # if the statement is an if, we want to get the expression and the target
+    # of the conditional jump
+    if stmt_body.token.text == 'IF':
+      expr, target_lbl = stmt_body.children
+      target_lbl = target_lbl.text
+      # if the target has been created, and the block following this has 
+      # also been created, then create the condition object and assign it to the block,
+      # and update the links
+      if target_lbl in lbl2index and nxt_leader in blocks:
+        true_index = lbl2index[target_lbl]
+        cond = CFGraph.Cond(expr.text, blocks[true_index], blocks[nxt_leader])
+        blocks[curr_blockno].cond = cond
+        links[curr_blockno].update([true_index, nxt_leader])
+      else:
+        # otherwise, we're not able to allocate this statement to a block
+        # at this stage, so put it back on the unallocated statement queue
+        stmt_no.append(curr_lineno)
+      continue
+
+    # if the statement is a goto, we want to get the target
+    # of the jump
+    if stmt_body.token.text == 'GOTO':
+      target_lbl, = stmt_body.children
+      # if the target block has been created, we can update the link to it
+      if target_lbl.text in lbl2index:
+        targ_index = lbl2index[target_lbl.text]
+        links[curr_blockno].add(targ_index)
+      else:
+        # otherwise, put it back on the queue
+        stmt_no.append(curr_lineno)
+      continue
+    
+    # if we've gotten here, it means that the statement is not an if or goto
+    # add it to the current block
+    blocks[curr_blockno].add_stmt(code_line)
+
+    # if we're at the last line before the start of the next block,
+    # and this statement is not an if or goto, it means that we need
+    # to add a link from this to the next block as it follows
+    # directly after this one
+    if curr_lineno == nxt_leader-1:
+      links[curr_blockno].add(nxt_leader)
+
   for index in blocks:
     l = links[index] # get all the indexes of outgoing link blocks
     blocks[index].add_edges([blocks[li] for li in l]) # add all the links
 
+  # create the graph
   g = CFGraph.CFGraph()
+  # blocks is hashed by lineno, so the first will always be the starting block
   g.root = blocks.values()[0]
-  g.blocks.update(blocks.values())
+  g.blocks.update(blocks.values()) # add all the blocks to the graph
 
   return g
 
