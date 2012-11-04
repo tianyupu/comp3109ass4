@@ -1,0 +1,20 @@
+  if 1 goto L2;
+  x = 5;
+  return x;
+L1:
+  b = 2 - 1;
+  if b goto L3;
+  c = 2;
+  return c;
+L2:
+  if a goto L1;
+  a = a + c;
+  return a;
+L3:
+  d = d + 1;
+  d = 2;
+  return d;
+L4:
+  a = 5;
+  b = a * 3;
+  return b;
