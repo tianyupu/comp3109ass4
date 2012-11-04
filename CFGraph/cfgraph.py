@@ -139,7 +139,8 @@ class CFGraph():
       raise ValueError("First and second block are not connected in the CFG")
 
     # Combine code and use second block's condition
-    new_block = BasicBlock(block1.code+'\n'+block2.code, block1.label, block2.cond)
+    #new_block = BasicBlock(block1.code+'\n'+block2.code, block1.label, block2.cond)
+    new_block = BasicBlock(block1.stmts+block2.stmts, block1.label, block2.cond)
 
     # Use first block's in jumps
     new_block.in_edges = set(block1.in_edges)
@@ -281,7 +282,8 @@ class CFGraph():
         code += '%s:\n' % block.label
       
       # Add block code with indentation
-      code += '\n'.join([indent+c for c in block.code.splitlines()])+'\n'
+      #code += '\n'.join([indent+c for c in block.code.splitlines()])+'\n'
+      code += '\n'.join([indent+str(c) for c in block.stmts])+'\n'
 
       # Next block of code
       prev_block = block

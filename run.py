@@ -2,7 +2,6 @@
 
 import sys
 from collections import deque, defaultdict
-from subprocess import call
 
 import antlr3
 from build.JumpLexer import JumpLexer
@@ -16,17 +15,9 @@ def main(filename):
   parser = JumpParser(tokens)
   root = parser.prog()
 
-  #x = [n.text for n in root.tree.children[2].children[-2].children]
-  #print "".join(x)
   g = make_graph(root.tree)
-  print g.root
-  print g.blocks
-  for block in g.blocks:
-    print block.stmts[0].var
-  f = open("run.dot", "w")
-  f.write(g.gen_graphviz())
-  f.close()
-  call("dot -T png run.dot -o run.png", shell=True)
+  g.optimize()
+  print g.code_string()
 
 def gen_leaders(leaders):
   nexts = deque()
