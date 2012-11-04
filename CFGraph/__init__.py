@@ -184,7 +184,15 @@ class CFGraph():
     pass
 
   def remove_unreachable(self):
-    self.blocks = set(self.reachable_blocks())
+    # Get the set of reachable blocks
+    new_blocks = set(self.reachable_blocks())
+
+    # Have we removed any blocks?
+    if new_blocks == self.blocks:
+      return False
+    else:
+      self.blocks = new_blocks
+      return True
 
   def remove_jumps(self):
     """ Removes unnecessary jumps from the CFG
