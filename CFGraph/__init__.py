@@ -179,9 +179,77 @@ class CFGraph():
 
   def remove_jumps(self):
     """ Removes unnecessary jumps from the CFG
+
+    >>> from examples import *
+    >>> jump_graph.remove_jumps()
+    True
+    >>> len(jump_graph.blocks) == 1
+    True
     """
 
-    pass
+    # Set of unoptimized blocks
+    blocks = set(self.blocks)
+    removed_jump = False
+
+    # Remove jumps
+    while blocks:
+      block = blocks.pop()
+
+      # Blocks with one in edge in the CFG can join with their in blocks
+      #  if the in block has only this block as an out edge
+      if len(block.in_edges) == 1:
+        in_block = list(block.in_edges)[0]
+        if in_block.out_edges == set([block]):
+          joined_block = self.combine(in_block, block)
+          removed_jump = True
+
+          # Start over
+          blocks = set(self.blocks)
+
+    # Have we really removed any jumps?
+    return removed_jump
+
+  def combine(self, block1, block2):
+    """ Combine two basic blocks into a single basic block.
+    This block is assumed to be the first block.
+    Raises an ValueError if the combination will not work"""
+
+    # Will not work if the first block has a condition
+    if block1.cond:
+      raise ValueError("First block has a conditional jump, it cannot be combined.")
+    # Or the second block has other in edges in the CFG
+    if len(block2.in_edges) > 1:
+      raise ValueError("The second block has muliple in edges in the CFG, it cannot be combined")
+    # Or the blocks do not join in the CFG
+    if not (block1.out_edges == set([block2]) and block2.in_edges == set([block1])):
+      raise ValueError("First and second block are not connected in the CFG")
+
+    # Combine code and use second block's condition
+    new_block = BasicBlock(block1.code+'\n'+block2.code, block1.label, block2.cond)
+
+    # Use first block's in jumps
+    new_block.in_edges = set(block1.in_edges)
+    # Use second block's out jumps
+    new_block.out_edges = set(block2.out_edges)
+
+    # Update incoming edges
+    for block in block1.in_edges:
+      block.out_edges.remove(block1)
+    for block in new_block.in_edges:
+      block.out_edges.add(new_block)
+
+    # Update outgoing edges
+    for block in block2.out_edges:
+      block.in_edges.remove(block2)
+    for block in new_block.out_edges:
+      block.in_edges.add(new_block)
+
+    # Remove old blocks
+    self.blocks.remove(block1)
+    self.blocks.remove(block2)
+
+    # Add new block
+    self.blocks.add(new_block)
   
   def linearized_blocks(self):
     """ Returns blocks much like the reachable_blocks method.
