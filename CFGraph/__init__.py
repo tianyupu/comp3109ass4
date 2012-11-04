@@ -169,7 +169,16 @@ class CFGraph():
     return s
 
   def optimize(self):
-    pass
+    # Keep optimizing until we can't
+    while True:
+      if self.remove_jumps():
+        continue # optimising
+      if self.remove_unreachable():
+        continue # optimising
+      if self.remove_dead_code():
+        continue # optimising
+
+      break # stop optimising
 
   def remove_dead_code(self):
     pass
