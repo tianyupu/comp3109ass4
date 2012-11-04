@@ -1,0 +1,12 @@
+  a = 2;
+  b = 1;
+L3:
+  a = a + 1;
+  test = a > 100;
+  if test goto L1;
+  b = b + 1;
+  test = b > 100;
+  if test goto L1;
+  goto L3;
+L1:
+  return 18;

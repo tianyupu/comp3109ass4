@@ -1,0 +1,20 @@
+  a = 2;
+  b = 1;
+  d = a + b;
+  goto L3;
+L2:
+  c = a + d;
+  return c;
+L3:
+  a = a + 1;
+  test = a > 100;
+  a = 15;
+  if test goto L2;
+  d = 3;
+  if d goto L5;
+L5:
+  b = b +1;
+  test = b > 100;
+  if test goto L2;
+  goto L3;
+

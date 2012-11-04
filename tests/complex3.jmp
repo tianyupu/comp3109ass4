@@ -1,0 +1,13 @@
+  a = 10 / 2;
+  b = a - 1;
+  c = c + b;
+  if c goto L2;
+  return 5;
+L2:
+  if d goto L1;
+  return i;
+L1:
+  d = 2;
+  d = d * d;
+  e = d + e;
+  return e;

@@ -1,0 +1,6 @@
+  a = g == g;
+  b = g < g;
+  d = 2;
+  q = a + b;
+  q = q + d;
+  return q;
