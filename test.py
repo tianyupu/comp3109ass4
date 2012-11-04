@@ -14,38 +14,38 @@ PROG_EXT = '.jmp'
 TEST_EXT = '.out'
 
 # Script for checking output of compiled program
-OUTPUT_TEST_SCRIPT = './run.sh %(test)s | diff -b - %(test)s'+TEST_EXT
+OUTPUT_TEST_SCRIPT = './run.sh %(test)s' + PROG_EXT + ' | diff -b - %(test)s' + TEST_EXT
 
 # Set to true to true for all tests
 # Set to false for specified subset
 ALL_TESTS = False
 # Subset of tests
 TESTS = [
-  'basic.jmp',
-  'basic2.jmp',
-  'basic3.jmp',
-  'basic4.jmp',
-  'basic5.jmp',
-  'changingVars.jmp',
-  'complex.jmp',
-  'complex2.jmp',
-  'complex3.jmp',
-  'complex4.jmp',
-  'complex5.jmp',
-  'complex6.jmp',
+  'basic',
+  'basic2',
+  'basic3',
+  'basic4',
+  'basic5',
+  'changingVars',
+  'complex',
+  'complex2',
+  'complex3',
+  'complex4',
+  'complex5',
+  'complex6',
   'dead.jmp',
-  'dead2.jmp',
-  'dead3.jmp',
-  'example.jmp',
-  'extended_example.jmp',
-  'manyJumps.jmp',
-  'simpleJumps.jmp',
-  'simpleJumps2.jmp',
-  'simpleJumps3.jmp',
-  'simpleJumps4.jmp',
-  'simple_unreachable.jmp',
-  'simple_unreachable2.jmp',
-  'unreachable.jmp',
+  'dead2',
+  'dead3',
+  'example',
+  'extended_example',
+  'manyJumps',
+  'simpleJumps',
+  'simpleJumps2',
+  'simpleJumps3',
+  'simpleJumps4',
+  'simple_unreachable',
+  'simple_unreachable2',
+  'unreachable',
 ]
 
 
