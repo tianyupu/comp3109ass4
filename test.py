@@ -9,21 +9,43 @@ from pipes import quote
 # The directory containing the test programs
 TEST_DIR = './tests'
 # The extension for the test programs
-PROG_EXT = '.jump'
+PROG_EXT = '.jmp'
 # The extension for checking the output of compile programs
-TEST_EXT = '.ans'
+TEST_EXT = '.out'
 
-# Compilation script
-COMPILE_SCRIPT = './compile.py %(test)s'+PROG_EXT+' --ANTLR=n'
 # Script for checking output of compiled program
-OUTPUT_TEST_SCRIPT = '%(test)s | diff -b - %(test)s'+TEST_EXT
+OUTPUT_TEST_SCRIPT = './run.sh %(test)s | diff -b - %(test)s'+TEST_EXT
 
 # Set to true to true for all tests
 # Set to false for specified subset
 ALL_TESTS = False
 # Subset of tests
 TESTS = [
-	'example',
+  'basic.jmp',
+  'basic2.jmp',
+  'basic3.jmp',
+  'basic4.jmp',
+  'basic5.jmp',
+  'changingVars.jmp',
+  'complex.jmp',
+  'complex2.jmp',
+  'complex3.jmp',
+  'complex4.jmp',
+  'complex5.jmp',
+  'complex6.jmp',
+  'dead.jmp',
+  'dead2.jmp',
+  'dead3.jmp',
+  'example.jmp',
+  'extended_example.jmp',
+  'manyJumps.jmp',
+  'simpleJumps.jmp',
+  'simpleJumps2.jmp',
+  'simpleJumps3.jmp',
+  'simpleJumps4.jmp',
+  'simple_unreachable.jmp',
+  'simple_unreachable2.jmp',
+  'unreachable.jmp',
 ]
 
 
@@ -33,7 +55,6 @@ class echo():
 		subprocess.call("echo -ne %s" % quote(string), shell=True)
 
 sys.stdout = echo()
-
 
 # Colour output
 def blue(string):
@@ -97,11 +118,6 @@ if ALL_TESTS:
   tests = [os.path.join(TEST_DIR, f[:-4]) for f in os.listdir(TEST_DIR) if f[-4:]==PROG_EXT]
 else:
 	tests = [os.path.join(TEST_DIR, f) for f in TESTS]
-
-
-# Compilation tests
-os.system("./compile.py --ANTLR=y")
-run_tests(COMPILE_SCRIPT, tests, "stderr", "Compilation tests")
 
 # Output tests
 run_tests(OUTPUT_TEST_SCRIPT, tests, ["stderr", "stdout"], "Output tests")
