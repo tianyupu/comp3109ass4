@@ -1,0 +1,11 @@
+  goto L5;
+L1:
+  return 1;
+L2:
+  goto L1;
+L3:
+  goto L2;
+L4:
+  goto L3;
+L5:
+  goto L4;

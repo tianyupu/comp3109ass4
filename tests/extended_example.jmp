@@ -1,0 +1,19 @@
+  i = 1;
+  s = 0;
+  b = i > 100;
+L1:
+  b = i > 100;
+  if b goto L2;
+  s = s + i;
+  i = i + 1;
+  goto L1;
+L2:
+  return s;
+  b = 3;
+  if b goto L3;
+L3:
+  if b goto L4;
+  b = b - 1;
+  goto L3;
+L4:
+  goto L2;
