@@ -1,0 +1,5 @@
+  if a goto L1;
+  a = a + c;
+  return a;
+L1:
+  return 2;
