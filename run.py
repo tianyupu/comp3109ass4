@@ -21,6 +21,8 @@ def main(filename):
   g = make_graph(root.tree)
   print g.root
   print g.blocks
+  for block in g.blocks:
+    print block.stmts[0].var
   f = open("run.dot", "w")
   f.write(g.gen_graphviz())
   f.close()
@@ -73,7 +75,9 @@ def make_graph(node):
     else:
       stmt_body, = stmt_node.children
     # the actual line of code at this line number
-    code_line = ' '.join([n.text for n in stmt_body.children]) + ';'
+    #code_line = ' '.join([n.text for n in stmt_body.children]) + ';'
+
+    s = CFGraph.Statement(stmt_body)
 
     # now we need to find the basic block that this statement belongs to
     # by examining each block number in turn and comparing it with the
@@ -93,7 +97,8 @@ def make_graph(node):
     # if this block hasn't been created yet, create it and we'll add
     # statements to it later
     if curr_blockno not in blocks:
-      new_block = CFGraph.BasicBlock(code_line, lbl, cond)
+      #new_block = CFGraph.BasicBlock(code_line, lbl, cond)
+      new_block = CFGraph.BasicBlock([s], lbl, cond)
       blocks[curr_blockno] = new_block
       lbl2index[new_block.label] = curr_blockno
       continue # move onto the next statement; notice that we've consumed a statement from stmt_no
@@ -132,7 +137,8 @@ def make_graph(node):
     
     # if we've gotten here, it means that the statement is not an if or goto
     # add it to the current block
-    blocks[curr_blockno].add_stmt(code_line)
+    #blocks[curr_blockno].add_stmt(code_line)
+    blocks[curr_blockno].add_stmt(s)
 
     # if we're at the last line before the start of the next block,
     # and this statement is not an if or goto, it means that we need

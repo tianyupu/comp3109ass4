@@ -7,12 +7,56 @@ class Cond():
   def __str__(self):
     return 'if %s goto %s;' % (self.var, self.true_block.label)
 
+class Statement():
+  def __init__(self, stmt_node):
+    """Creates a Statement object from a given stmt AST node.
+    
+    Note that IF statements are not covered, as they are 
+    Cond objects. They will always occur at the end of a Basic
+    Block, and their variable name can be accessed using 
+    <instancename>.var."""
+
+    # stores the actual line of code for this statement
+    self.code = ' '.join([n.text for n in stmt_node.children]) + ';'
+
+    # if it's an assign statement of some sort,
+    # then the destination variable (LHS) can be accessed via the
+    # var attribute. depending on the type of assignment,
+    # the RHS can have 1 or 2 operands. access them with rhs1
+    # and rhs2. if rhs2 doesn't exist, then its value is None
+    if stmt_node.token.text.startswith('ASSIGN'):
+      self.type = 'ASSIGN'
+      if stmt_node.token.text == 'ASSIGN1':
+        var, eq, rhs1 = stmt_node.children
+        rhs2 = None
+      else:
+        var, eq, rhs1, op, rhs2 = stmt_node.children
+      self.var = var.text
+      self.rhs1 = rhs1.text
+      self.rhs2 = rhs2.text if rhs2 else None
+
+    # if it's a return statement, then you can get
+    # the name of the variable that is to be returned
+    # by using the var attribute of this object also
+    if stmt_node.token.text == 'RETURN':
+      self.type = 'RETURN'
+      retword, var = stmt_node.children
+      self.var = var.text
+
+  def __str__(self):
+    return self.code
+
+  def __repr__(self):
+    return self.code
+
 class BasicBlock():
   label_num = 0
-  def __init__(self, code, label=None, cond=None):
-    """Create a BasicBlock from a string of statements."""
+  def __init__(self, stmts, label=None, cond=None):
+    """Create a BasicBlock from a list of Statement objects."""
     # Remove unnecessary whitespace from code
-    self.code = '\n'.join([line.strip() for line in code.strip().splitlines()])
+    self.code = '\n'.join([str(stmt).strip() for stmt in stmts])
+    #self.code = '\n'.join([line.strip() for line in code.strip().splitlines()])
+    self.stmts = stmts # a list of statement objects
 
     # Label for the basic block
     if label == None:
@@ -34,8 +78,9 @@ class BasicBlock():
 
   def add_stmt(self, stmt):
     """Add a single statement to the end of this BasicBlock,
-    given as a string."""
-    self.code += '\n' + stmt.strip()
+    given as a Statement object."""
+    self.code += '\n' + str(stmt).strip()
+    self.stmts.append(stmt)
   
   @staticmethod
   def gen_label():
@@ -98,5 +143,3 @@ class BasicBlock():
 
   def __repr__(self):
     return "<BasicBlock: %s>" % str(self.label)
-
-
