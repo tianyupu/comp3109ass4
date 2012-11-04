@@ -65,7 +65,9 @@ graphs['jump'] = jump_graph
 b15 = BasicBlock("""
     x = 100""", 'L5')
 
-dead_graph = copy(jump_graph)
+dead_graph = CFGraph()
+dead_graph.root = b11 
+dead_graph.blocks.update([b11, b12, b13, b14, b15])
 
 dead_graph.blocks.add(b15)
 graphs['dead'] = dead_graph
