@@ -67,7 +67,7 @@ class CFGraph():
     return s
 
   def optimize(self):
-    # Keep optimizing until we can't
+    # Keep optimising until we can't
     while True:
       if self.remove_jumps():
         continue # optimising
@@ -166,6 +166,10 @@ class CFGraph():
 
     # Add new block
     self.blocks.add(new_block)
+
+    # Update root
+    if self.root == block1 or self.root == block2:
+      self.root = new_block
   
   def linearized_blocks(self):
     """ Returns blocks much like the reachable_blocks method.
