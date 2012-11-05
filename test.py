@@ -23,7 +23,6 @@ ALL_TESTS = False
 TESTS = [
   'basic',
   'basic3',
-  'complex',
   'complex2',
   'complex3',
   'complex4',
