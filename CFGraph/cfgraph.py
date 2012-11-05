@@ -82,15 +82,23 @@ class CFGraph():
     return deadcode(self)
 
   def remove_unreachable(self):
-    # Get the set of reachable blocks
-    new_blocks = set(self.reachable_blocks())
+    # Get the set of reachable and unreachable blocks
+    reachable = set(self.reachable_blocks())
+    unreachable = self.blocks - reachable
 
     # Have we removed any blocks?
-    if new_blocks == self.blocks:
-      return False
-    else:
-      self.blocks = new_blocks
+    if unreachable:
+      self.blocks = reachable
+
+      # Remove lingering edges
+      for block in self.blocks:
+        for removed_block in unreachable:
+          block.in_edges.discard(removed_block)
+
       return True
+
+    else:
+      return False
 
   def remove_jumps(self):
     """ Removes unnecessary jumps from the CFG
