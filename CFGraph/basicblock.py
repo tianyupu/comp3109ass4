@@ -58,8 +58,11 @@ class BasicBlock():
   label_num = 0
   def __init__(self, stmts, label=None, cond=None):
     """Create a BasicBlock from a list of Statement objects."""
-    # Remove unnecessary whitespace from code
-    self.code = '\n'.join([str(stmt).strip() for stmt in stmts])
+    if stmts:
+      # Remove unnecessary whitespace from code
+      self.code = '\n'.join([str(stmt).strip() for stmt in stmts])
+    else:
+      self.code = ''
     #self.code = '\n'.join([line.strip() for line in code.strip().splitlines()])
     self.stmts = stmts # a list of statement objects
 

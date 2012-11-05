@@ -68,7 +68,7 @@ def make_graph(node):
     # the actual line of code at this line number
     #code_line = ' '.join([n.text for n in stmt_body.children]) + ';'
 
-    s = CFGraph.Statement(stmt_body)
+    #s = CFGraph.Statement(stmt_body)
 
     # now we need to find the basic block that this statement belongs to
     # by examining each block number in turn and comparing it with the
@@ -89,10 +89,10 @@ def make_graph(node):
     # statements to it later
     if curr_blockno not in blocks:
       #new_block = CFGraph.BasicBlock(code_line, lbl, cond)
-      new_block = CFGraph.BasicBlock([s], lbl, cond)
+      new_block = CFGraph.BasicBlock([], lbl, cond)
       blocks[curr_blockno] = new_block
       lbl2index[new_block.label] = curr_blockno
-      continue # move onto the next statement; notice that we've consumed a statement from stmt_no
+      #continue # move onto the next statement; notice that we've consumed a statement from stmt_no
 
     # if the statement is an if, we want to get the expression and the target
     # of the conditional jump
@@ -129,6 +129,7 @@ def make_graph(node):
     # if we've gotten here, it means that the statement is not an if or goto
     # add it to the current block
     #blocks[curr_blockno].add_stmt(code_line)
+    s = CFGraph.Statement(stmt_body)
     blocks[curr_blockno].add_stmt(s)
 
     # if we're at the last line before the start of the next block,
