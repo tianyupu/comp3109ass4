@@ -15,3 +15,11 @@ Run the following command:
 ```shell
   $ ./test.py
 ```
+This tests all of the files in tests
+
+## Where stuff is
+Unreachable code is removed within the `CFGraph/cfgraph.py` file within the function `remove_unreachable`
+
+Jump elimination is also performed within the `CFGraph/cfgraph.py` file within the function `remove_jump`
+
+Dead code elimination is performed in `CFGraph/deadcode.py` this is called in the `CFGraph/cfgraph.py` file with the function remove_dead.
