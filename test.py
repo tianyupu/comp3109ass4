@@ -14,7 +14,7 @@ PROG_EXT = '.jmp'
 TEST_EXT = '.out'
 
 # Script for checking output of compiled program
-OUTPUT_TEST_SCRIPT = './run.sh %(test)s' + PROG_EXT + ' | diff -b - %(test)s' + TEST_EXT
+OUTPUT_TEST_SCRIPT = './run.sh %(test)s' + PROG_EXT + ' | diff -wB - %(test)s' + TEST_EXT
 
 # Set to true to true for all tests
 # Set to false for specified subset
