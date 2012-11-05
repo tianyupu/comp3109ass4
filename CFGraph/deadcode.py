@@ -10,44 +10,47 @@ from __init__ import *
 
 def deadcode(graph):
 
-  # set of vars with potential to have associated dead code
-  unused_live_vars = set()
+  # vars that have been declared, but are unused 
+  live_vars = set()
+
+  # vars that have been used
+  used_live_vars = set()
 
   # pairs of active vars and which line they refer to, permitting deletion of dead code
-  line_ref = []
+  #line_ref = []
 
-  # remove dead code from first block
-  start = graph.root
-  unused_live_vars = deadBlock(start,unused_live_vars)
+  # set of nodes to work with
+  work = set(graph.reachable_blocks())
+  
+  while True:
 
-  # continue through rest of graph
-  x = downGraph(graph, graph.block.out_edges[0], deadBlock(block,unused_live_vars))
-  return x
+    # find all dead vars
+    for block in work:
+      for statement in block.stmts:
+        if statement.var:
+          live_vars.add(statement.var)
+          if statement.type == 'RETURN':
+            used_live_vars.add(statement.var)
+        if statement.rhs1:
+          used_live_vars.add(statement.rhs1)
+        if statement.rhs2:
+          used_live_vars.add(statement.rhs2)
 
-def downGraph(graph, block, unused_live_vars):
-  if len(graph.block.out_edges) == 0:
-    return unused_live_vars
-  if len(graph.block.out_edges) == 1:
-    x = downGraph(graph, graph.block.out_edges[0], deadBlock(block,unused_live_vars))
-  else:
-    x = downGraph(graph, graph.block.out_edges[0], deadBlock(block,unused_live_vars))
-    i = 1
-    while i >= len(graph.block.out_edges):
-      x = x.union(downGraph(graph, graph.block.out_edges[i], deadBlock(block,unused_live_vars))
-      i += 1
-  return x
+      if block.cond and block.cond.var:
+        used_live_vars.add(block.cond.var)
 
-def deadBlock(block,unused_live_vars):
-  for line in block:
-    # if a var on lhs
-      # if var is in unused_live_vars
-        # the previous declaration is dead code line; remove it
-      # else
-        # add it to unused_live_vars
-    # if a var is on the rhs
-      # if var is in unused_live_vars
-        # remove it from unused_live_vars
-      # else
-        # ignore it, it is just being used again
-  return unused_live_vars
+    dead_vars = live_vars - used_live_vars
+    if not dead_vars:
+      break
+
+    # remove all dead statements
+    for block in work:
+      live_stmts = []
+      print 'live_stmts', live_stmts
+      for statement in block.stmts:
+        if statement.var not in dead_vars:
+          live_stmts.append(statement)
+        else:
+          print 'removing a statement', statement
+      block.stmts = live_stmts
 
