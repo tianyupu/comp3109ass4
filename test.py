@@ -22,11 +22,7 @@ ALL_TESTS = False
 # Subset of tests
 TESTS = [
   'basic',
-  'basic2',
   'basic3',
-  'basic4',
-  'basic5',
-  'changingVars',
   'complex',
   'complex2',
   'complex3',

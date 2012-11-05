@@ -22,7 +22,7 @@ class Statement():
     self.type = None
 
     # stores the actual line of code for this statement
-    self.code = ' '.join([n.text for n in stmt_node.children]) + ';'
+    self.code = ' '.join([n.text for n in stmt_node.children if n.text]) + ';'
 
     # if it's an assign statement of some sort,
     # then the destination variable (LHS) can be accessed via the

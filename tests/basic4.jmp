@@ -1,5 +1,0 @@
-  blah = blah == blah;
-  if blah goto L1;
-  return a;
-L1:
-  return blah;

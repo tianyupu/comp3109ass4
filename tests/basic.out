@@ -1,1 +1,4 @@
+  if -1 goto L1;
+  return 0;
+L1:
   return 1;
