@@ -1,4 +1,5 @@
 from basicblock import BasicBlock
+from deadcode import deadcode 
 
 class CFGraph():
   def __init__(self):
@@ -78,7 +79,7 @@ class CFGraph():
       break # stop optimising
 
   def remove_dead_code(self):
-    pass
+    return deadcode(self)
 
   def remove_unreachable(self):
     # Get the set of reachable blocks

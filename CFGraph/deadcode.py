@@ -22,9 +22,8 @@ def deadcode(graph):
   # set of nodes to work with
   work = set(graph.reachable_blocks())
  
-  i=0
-
-  while True and i < 10:
+  optimised = False
+  while True:
     
     live_vars = set()
     used_live_vars = set()
@@ -41,8 +40,6 @@ def deadcode(graph):
             live_vars.add(statement.rhs1)
           if statement.rhs2:
             live_vars.add(statement.rhs2)
-
-
     
     new_vars = True
     while new_vars:
@@ -70,8 +67,9 @@ def deadcode(graph):
         if statement.var not in dead_vars:
           live_stmts.append(statement)
         else:
-          pass
+          optimised = True 
           #print 'removing a statement', statement
       block.stmts = live_stmts
 
-    i+=1
+  return optimised
+
