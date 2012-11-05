@@ -29,8 +29,12 @@ def deadcode(graph):
     used_live_vars = set()
 
     for block in work:
+      if block.cond:
+        used_live_vars.add(block.cond.var)
+        live_vars.add(block.cond.var)
+
       for statement in block.stmts:
-        if statement.type == 'RETURN':
+        if statement.type is 'RETURN':
           used_live_vars.add(statement.var)
           live_vars.add(statement.var)
         else:
