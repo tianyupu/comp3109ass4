@@ -1,5 +1,12 @@
   if a goto L1;
-  a = a + c;
-  return a;
-L1:
-  return 2;
+  x = 5;
+  return x;
+L2:
+  b = 2 - 1;
+  if b goto L3;
+  c = 2;
+  return c;
+L3:
+  d = d + 1;
+  d = 2;
+  return d;
