@@ -241,12 +241,12 @@ class CFGraph():
           cond.append(block.cond.true_block)
           cond.append(block.cond.false_block)
     
-  def code_string(self, indent='', optimized=True):
+  def code_string(self, indent='  ', optimized=True):
     """ Linearizes the CFG and
     returns a string of code
 
     >>> from examples import *
-    >>> print simple_graph.code_string()
+    >>> print simple_graph.code_string('')
     i = 1;
     s = 0;
     L1:

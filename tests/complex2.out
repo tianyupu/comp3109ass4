@@ -1,12 +1,13 @@
   a = 2;
   b = 1;
   d = a + b;
+L3:
   a = a + 1;
   test = a > 100;
   a = 15;
   if test goto L2;
   d = 3;
-  b = b +1;
+  b = b + 1;
   test = b > 100;
   if test goto L2;
   goto L3;
