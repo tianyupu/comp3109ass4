@@ -42,7 +42,7 @@ def make_graph(node):
       leaders.append(lineno)
     # if previous was goto, if or return, 
     # then this will be start of new block
-    elif lineno > 1:
+    elif lineno > 0:
       prev_stmt = node.children[lineno-1]
       stmt_body = prev_stmt.children[-1]
       if stmt_body.token.text in ['GOTO', 'IF', 'RETURN']:
@@ -135,8 +135,14 @@ def make_graph(node):
     # and this statement is not an if or goto, it means that we need
     # to add a link from this to the next block as it follows
     # directly after this one
-    if curr_lineno == nxt_leader-1:
+    next_node = node.children[nxt_leader-1]
+    if len(next_node.children) == 2:
+      next_lbl, next_stmt_body = stmt_node.children
+    else:
+      next_stmt_body, = next_node.children
+    if curr_lineno == nxt_leader-1 and next_stmt_body.token.text != 'RETURN':
       links[curr_blockno].add(nxt_leader)
+
 
   for index in blocks:
     l = links[index] # get all the indexes of outgoing link blocks
