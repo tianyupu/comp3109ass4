@@ -164,10 +164,11 @@ class CFGraph():
       block.out_edges.remove(block1)
     for block in new_block.in_edges:
       block.out_edges.add(new_block)
-      if block.cond.true_block is block1:
-        block.cond.true_block = new_block
-      if block.cond.false_block is block1:
-        block.cond.false_block = new_block
+      if block.cond:
+        if block.cond.true_block is block1:
+          block.cond.true_block = new_block
+        if block.cond.false_block is block1:
+          block.cond.false_block = new_block
 
     # Update outgoing edges
     for block in block2.out_edges:
