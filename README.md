@@ -9,3 +9,9 @@ Currently, to compile, use `run.sh` and the name of the example file.
 ```shell
   $ ./run.sh example.jmp
 ```
+
+## Testing
+Run the following command:
+```shell
+  $ ./test.py
+```
