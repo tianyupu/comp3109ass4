@@ -19,6 +19,8 @@ class Statement():
     self.var = None
     self.rhs1 = None
     self.rhs2 = None
+    self.type = None
+
     # stores the actual line of code for this statement
     self.code = ' '.join([n.text for n in stmt_node.children]) + ';'
 

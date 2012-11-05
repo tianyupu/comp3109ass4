@@ -21,36 +21,57 @@ def deadcode(graph):
 
   # set of nodes to work with
   work = set(graph.reachable_blocks())
-  
-  while True:
+ 
+  i=0
 
-    # find all dead vars
+  while True and i < 10:
+    
+    live_vars = set()
+    used_live_vars = set()
+
     for block in work:
       for statement in block.stmts:
-        if statement.var:
+        if statement.type == 'RETURN':
+          used_live_vars.add(statement.var)
           live_vars.add(statement.var)
-          if statement.type == 'RETURN':
-            used_live_vars.add(statement.var)
-        if statement.rhs1:
-          used_live_vars.add(statement.rhs1)
-        if statement.rhs2:
-          used_live_vars.add(statement.rhs2)
+        else:
+          if statement.var:
+            live_vars.add(statement.var)
+          if statement.rhs1:
+            live_vars.add(statement.rhs1)
+          if statement.rhs2:
+            live_vars.add(statement.rhs2)
 
-      if block.cond and block.cond.var:
-        used_live_vars.add(block.cond.var)
+
+    
+    new_vars = True
+    while new_vars:
+      new_vars = False
+      for block in work:
+        for statement in block.stmts:
+          if statement.var in used_live_vars:
+            if statement.rhs1 and statement.rhs1 not in used_live_vars:
+              used_live_vars.add(statement.rhs1)
+              new_vars = True
+            if statement.rhs1 and statement.rhs2 not in used_live_vars:
+              used_live_vars.add(statement.rhs2)
+              new_vars = True
 
     dead_vars = live_vars - used_live_vars
+    #print 'dead', dead_vars
     if not dead_vars:
       break
 
     # remove all dead statements
     for block in work:
       live_stmts = []
-      print 'live_stmts', live_stmts
+      #print 'live_stmts', live_stmts
       for statement in block.stmts:
         if statement.var not in dead_vars:
           live_stmts.append(statement)
         else:
-          print 'removing a statement', statement
+          pass
+          #print 'removing a statement', statement
       block.stmts = live_stmts
 
+    i+=1
