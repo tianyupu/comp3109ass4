@@ -33,7 +33,7 @@ TESTS = [
   'complex4',
   'complex5',
   'complex6',
-  'dead.jmp',
+  'dead',
   'dead2',
   'dead3',
   'example',
