@@ -130,7 +130,7 @@ class CFGraph():
     Raises an ValueError if the combination will not work"""
 
     # Will not work if the first block has a condition
-    if block1.cond:
+    if block1.cond and not (block1.cond.true_block is block2 and block1.cond.false_block is block2):
       raise ValueError("First block has a conditional jump, it cannot be combined.")
     # Or the second block has other in edges in the CFG
     if len(block2.in_edges) > 1:
@@ -148,11 +148,26 @@ class CFGraph():
     # Use second block's out jumps
     new_block.out_edges = set(block2.out_edges)
 
+    # Remove old blocks
+    self.blocks.remove(block1)
+    self.blocks.remove(block2)
+    
+    # Update root
+    if self.root == block1 or self.root == block2:
+      self.root = new_block
+    
+    # Add new block
+    self.blocks.add(new_block)
+
     # Update incoming edges
     for block in block1.in_edges:
       block.out_edges.remove(block1)
     for block in new_block.in_edges:
       block.out_edges.add(new_block)
+      if block.cond.true_block is block1:
+        block.cond.true_block = new_block
+      if block.cond.false_block is block1:
+        block.cond.false_block = new_block
 
     # Update outgoing edges
     for block in block2.out_edges:
@@ -160,16 +175,7 @@ class CFGraph():
     for block in new_block.out_edges:
       block.in_edges.add(new_block)
 
-    # Remove old blocks
-    self.blocks.remove(block1)
-    self.blocks.remove(block2)
 
-    # Add new block
-    self.blocks.add(new_block)
-
-    # Update root
-    if self.root == block1 or self.root == block2:
-      self.root = new_block
   
   def linearized_blocks(self):
     """ Returns blocks much like the reachable_blocks method.
@@ -188,7 +194,7 @@ class CFGraph():
     """
 
     # Set of all blocks
-    all_blocks = set(self.reachable_blocks())
+    all_blocks = set(self.blocks)
 
     # Set of blocks to explore
     cond = []
@@ -260,7 +266,7 @@ class CFGraph():
       linearized_blocks = self.linearized_blocks()
     else:
       linearized_blocks = self.reachable_blocks()
-
+    
     # Join together the blocks of code
     prev_block = None
     for block in linearized_blocks:
@@ -275,7 +281,7 @@ class CFGraph():
             code += indent+str(cond)+'\n'
           elif len(jumps) == 2:
             code += indent+str(cond)+'\n'
-            code += indent+'goto %s\n' % cond.false.label
+            code += indent+'goto %s\n' % cond.false_block.label
         
         # Non-conditional jump cases
         else:
